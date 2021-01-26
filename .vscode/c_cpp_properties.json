@@ -1,0 +1,28 @@
+{
+    "configurations": [
+        {
+            "name": "Linux",
+            "includePath": [
+                "/snap/arduino/50/tools/**",
+                "/home/softarm/Arduino/libraries/**",
+                "/snap/arduino/50/libraries/**",
+                "/snap/arduino/50/hardware/tools/**",
+                "/snap/arduino/50/hardware/arduino/avr/**"
+            ],
+            "forcedInclude": [
+                "/snap/arduino/50/hardware/arduino/avr/cores/arduino/Arduino.h"
+            ],
+            "defines": [
+                "USBCON",
+                "ARDUINO=10813",
+                "ARDUINO_AVR_MEGA2560",
+                "ARDUINO_ARCH_AVR"
+            ],
+            "intelliSenseMode": "gcc-x64",
+            "compilerPath": "/usr/bin/clang-9",
+            "cStandard": "c11",
+            "cppStandard": "c++14"
+        }
+    ],
+    "version": 4
+}
