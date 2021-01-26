@@ -1,4 +1,15 @@
-# hydrosoft_arduino
-The .h/.cpp files are modifed from the Pneudrive rep.
 
-communicate through rosserial (default baudrate 57600)
+# Installation:
+
+merge the libraries folder with your arduino libraries. 
+
+Normally, the directory tree would look like
+
+Arduino_workspace/
+     -/hydrosoft_arduino
+     -/libraries
+         -/ros_lib
+
+
+# Feature: 
+Communicate through rosserial (default baudrate 57600)
