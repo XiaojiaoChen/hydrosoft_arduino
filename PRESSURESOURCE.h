@@ -29,6 +29,7 @@ public:
 	int32_t readPressure();
 	void maintainPressure(int32_t p_low,int32_t p_high);
 	void stop(void);
+	void start(void);
 	int sourceType;
 	PUMP pump;
 	PRESSURE_SENSOR pressureSensor;

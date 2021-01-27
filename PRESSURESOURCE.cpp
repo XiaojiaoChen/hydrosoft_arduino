@@ -61,7 +61,10 @@ void PRESSURE_SOURCE::stop()
 {
 	pump.stop();
 }
-
+void PRESSURE_SOURCE::start()
+{
+	pump.start();
+}
 
 int32_t PRESSURE_SOURCE::readPressure() {
 	pressure=pressureSensor.read();

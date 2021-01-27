@@ -74,8 +74,16 @@ void CHAMBER::writePressure(int32_t pNom)//Pa
 	writeOpening(opening);
 }
 void CHAMBER::writeOpening(int16_t op){
-
-	if(op>0){
+	opening=op;
+	if(op==0){
+		valves[0].writeDuty(0);
+		valves[1].writeDuty(0);
+	}
+	else if(op==2){
+		valves[0].writeDuty(1);
+		valves[1].writeDuty(1);
+	}
+	else if(op>0){
 
 		valves[0].writeDuty(opening);
 		valves[1].writeDuty(0);

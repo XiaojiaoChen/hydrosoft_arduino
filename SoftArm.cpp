@@ -34,16 +34,14 @@ void SOFT_ARM::setupPumpPorts(int *controlPorts, int *sensorPorts)
 	pSink.attach(controlPorts[1], sensorPorts[1]);
 }
 
-
 void SOFT_ARM::maintainUpPressure(int32_t posP, int32_t posP2)
 {
-  	pSource.maintainPressure(posP, posP2);
+	pSource.maintainPressure(posP, posP2);
 }
 void SOFT_ARM::maintainDownPressure(int32_t negP, int32_t negP2)
 {
-  	pSource.maintainPressure(negP, negP2);
+	pSource.maintainPressure(negP, negP2);
 }
-
 
 void SOFT_ARM::readPressureAll()
 {
@@ -67,10 +65,9 @@ void SOFT_ARM::zeroPressureAll()
 	}
 }
 
-
-void SOFT_ARM::writePressureAll(int32_t* pCommand)
+void SOFT_ARM::writePressureAll(int32_t *pCommand)
 {
-	int k=0;
+	int k = 0;
 	for (int j = 0; j < SEGNUM; j++)
 	{
 		for (int i = 0; i < ACTNUM; i++)
@@ -82,7 +79,7 @@ void SOFT_ARM::writePressureAll(int32_t* pCommand)
 
 void SOFT_ARM::writeOpeningAll(int16_t op)
 {
-	
+
 	for (int j = 0; j < SEGNUM; j++)
 	{
 		for (int i = 0; i < ACTNUM; i++)
@@ -92,12 +89,28 @@ void SOFT_ARM::writeOpeningAll(int16_t op)
 	}
 }
 
+void SOFT_ARM::startPumpIn()
+{
+	pSource.start();
+}
+void SOFT_ARM::stopPumpIn()
+{
+	pSource.stop();
+}
+void SOFT_ARM::startPumpOut()
+{
+	pSink.start();
+}
+void SOFT_ARM::stopPumpOut()
+{
+	pSink.stop();
+}
+
 
 void SOFT_ARM::execInfoCommand(char *infoBuf)
 {
 	if (infoBuf[0] == 'z')
 	{
-
 	}
 	if (infoBuf[0] == 'o')
 	{
