@@ -22,7 +22,7 @@ public:
 	void start();
 	void stop();
 	int DigitalPort;
-	int status;
+	int16_t status;
 };
 
 #ifdef __cplusplus

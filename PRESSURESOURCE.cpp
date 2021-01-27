@@ -11,10 +11,9 @@
 #include "PRESSURESOURCE.h"
 
 
-
-PRESSURE_SOURCE::PRESSURE_SOURCE(int DigitalPort, int AnalogPort) {
+PRESSURE_SOURCE::PRESSURE_SOURCE(int DigitalPort, int AnalogPort,int sType) {
 	attach(DigitalPort,AnalogPort);
-	sourceType = 0;
+	sourceType = sType;
 	direction=0;
 	pressure=0;
 	pressureLower=0;
@@ -40,20 +39,25 @@ void PRESSURE_SOURCE::maintainPressure(int32_t p_low,int32_t p_high) {
 	pressureLower=p_low;
 	pressureUpper=p_high;
 	readPressure();
-
-	if(pressure<pressureLower)
-	{
-		if(pressureLower>0)
-			pump.start();
-		else
+	if(sourceType==LOW_PRESSURE_SINK){
+		if(pressure<pressureLower)
+		{
 			pump.stop();
+		}
+		else if(pressure>pressureUpper)
+		{
+			pump.start();
+		}
 	}
-	else if(pressure>pressureUpper)
-	{
-		if(pressureUpper<0)
+	else if(sourceType==HIGH_PRESSURE_SOURCE){
+		if(pressure<pressureLower)
+		{
 			pump.start();
-		else
+		}
+		else if(pressure>pressureUpper)
+		{
 			pump.stop();
+		}
 	}
 
 }
@@ -67,6 +71,10 @@ void PRESSURE_SOURCE::start()
 }
 
 int32_t PRESSURE_SOURCE::readPressure() {
-	pressure=pressureSensor.read();
+	int32_t pp=pressureSensor.read();
+	if(sourceType==LOW_PRESSURE_SINK){
+		pp=-pp;
+	}
+	pressure = pp;
 	return pressure;
 }

@@ -20,9 +20,14 @@ extern "C" {
 
 #include "PUMP.h"
 #include "PRESSURESENSOR.h"
+typedef enum{
+	HIGH_PRESSURE_SOURCE = 0,
+	LOW_PRESSURE_SINK=1
+}PRESSURE_SOURCE_TYPE;
+
 class PRESSURE_SOURCE {
 public:
-	PRESSURE_SOURCE(int DigitalPort=0,int AnalogPort=0);
+	PRESSURE_SOURCE(int DigitalPort=0,int AnalogPort=0,int Psourcetype=HIGH_PRESSURE_SOURCE);
 	void attach(int DigitalPort,int AnalogPort);
 	void attachPump(int DigitalPort);
 	void attachSensor(int AnalogPort);

@@ -29,7 +29,7 @@ extern "C"
 		PRESSURE_SOURCE pSink;
 
 		void setupValvePorts(int *ports);
-		void setupPumpPorts(int *controlPorts, int *sensorPorts);
+		void setupPumpPorts(int cp1,int sp1, int cp2, int sp2);
 
 		void maintainUpPressure(int32_t posP, int32_t posP2);
 		void maintainDownPressure(int32_t negP, int32_t negP2);

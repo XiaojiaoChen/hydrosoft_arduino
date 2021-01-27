@@ -10,7 +10,9 @@
 /*************************SOFT ARM**************************
  *
  ***********************************************************/
-SOFT_ARM::SOFT_ARM()
+SOFT_ARM::SOFT_ARM():
+pSource(0,0,HIGH_PRESSURE_SOURCE),
+pSink(0,0,LOW_PRESSURE_SINK)
 {
 }
 
@@ -28,10 +30,10 @@ void SOFT_ARM::setupValvePorts(int *ports)
 	}
 }
 
-void SOFT_ARM::setupPumpPorts(int *controlPorts, int *sensorPorts)
+void SOFT_ARM::setupPumpPorts(int cp1,int sp1, int cp2, int sp2)
 {
-	pSource.attach(controlPorts[0], sensorPorts[0]);
-	pSink.attach(controlPorts[1], sensorPorts[1]);
+	pSource.attach(cp1, sp2);
+	pSink.attach(cp2, sp2);
 }
 
 void SOFT_ARM::maintainUpPressure(int32_t posP, int32_t posP2)
@@ -40,7 +42,7 @@ void SOFT_ARM::maintainUpPressure(int32_t posP, int32_t posP2)
 }
 void SOFT_ARM::maintainDownPressure(int32_t negP, int32_t negP2)
 {
-	pSource.maintainPressure(negP, negP2);
+	pSink.maintainPressure(negP, negP2);
 }
 
 void SOFT_ARM::readPressureAll()
