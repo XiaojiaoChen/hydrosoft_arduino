@@ -28,8 +28,8 @@ extern "C"
 		PRESSURE_SOURCE pSource;
 		PRESSURE_SOURCE pSink;
 
-		void setupValvePorts(int *ports);
-		void setupPumpPorts(int cp1,int sp1, int cp2, int sp2);
+		void setupValvePorts(uint8_t *ports);
+		void setupPumpPorts(uint8_t cp1,uint8_t sp1, uint8_t cp2, uint8_t sp2);
 
 		void maintainUpPressure(int32_t posP, int32_t posP2);
 		void maintainDownPressure(int32_t negP, int32_t negP2);
@@ -37,7 +37,8 @@ extern "C"
 		void readPressureAll();
 		void writePressureAll(int32_t *pCommand);
 
-		void writeOpeningAll(int16_t op);
+		void writeOpening(int16_t op);
+		void writeOpeningAll(int16_t *op);
 		void zeroPressureAll();
 		void execInfoCommand(char *);
 

@@ -21,22 +21,22 @@
 hydrosoft_ros::Command_Position_Arm posCmd;
 //Port configuration on mega2560
 
-int valveControlPorts[16] =
+uint8_t valveControlPorts[2*ACTALLNUM] =
     // Act1      Act2       Act3      Act4
     //In,Out,   In,Out,   In,Out,   In,Out,
     {
         29, 45, 31, 47, 33, 49, 22, 38, //Seg 1  (Root segment)
         24, 40, 26, 42, 28, 44, 30, 46  //Seg 2
 };
-int PumpControlPorts[2] =
+uint8_t PumpControlPorts[2] =
     { // PumpHigh      PumpLow
         25, 41};
 
-int PumpSensorPorts[2] = {
+uint8_t PumpSensorPorts[2] = {
     // PumpHigh      PumpLow
     54, 55}; //A0 A1
 
-int32_t commandActuator[ACTALLNUM];  //translated command in Pa
+int16_t commandActuator[ACTALLNUM];  //translated command in Pa
 
 int32_t pressureUp=30000;    //30,000Pa limit  for positive pressure
 int32_t pressureDown=-30000; //-30,000Pa limit for negative pressure
@@ -66,12 +66,18 @@ hydrosoft_ros::Sensor_Arm sensor_msg; //transfer in KPa
 void subscriberCallback(const hydrosoft_ros::Command_Arm &cmd_msg)
 {
 
-  for (int i = 0; i < ACTALLNUM; i++)
+  // for (int i = 0; i < ACTALLNUM; i++)
+  // {
+  //   commandActuator[i] = ((int32_t)cmd_msg.actuator[i]) * 1000;
+  // }
+  // pressureUp = ((int32_t)cmd_msg.pumpIn) * 1000;    //transfer in KPa, local in Pa
+  // pressureDown = ((int32_t)cmd_msg.pumpOut) * 1000; //transfer in KPa, local In Pa
+    for (int i = 0; i < ACTALLNUM; i++)
   {
-    commandActuator[i] = ((int32_t)cmd_msg.actuator[i]) * 1000;
+    commandActuator[i] = cmd_msg.actuator[i];
   }
-  pressureUp = ((int32_t)cmd_msg.pumpIn) * 1000;    //transfer in KPa, local in Pa
-  pressureDown = ((int32_t)cmd_msg.pumpOut) * 1000; //transfer in KPa, local In Pa
+  pressureUp = (cmd_msg.pumpIn);   
+  pressureDown = (cmd_msg.pumpOut); 
   host_command.mannual_control = __GET_BIT(cmd_msg.cmd, MANNUALMASK);
   host_command.pumpIn = __GET_BIT(cmd_msg.cmd, PUMPINMASK);
   host_command.pumpOut = __GET_BIT(cmd_msg.cmd, PUMPOUTMASK);
@@ -86,6 +92,10 @@ ros::Subscriber<hydrosoft_ros::Command_Arm> sub_("HydroCommands", &subscriberCal
 SOFT_ARM softArm;
 void setup()
 {
+
+  for(int i=0;i<2;i++){
+     pinMode(PumpSensorPorts[i],INPUT);
+  }
   //Serial.println("Arduino Started");
   node_handle.initNode();
   node_handle.advertise(pub_);
@@ -112,13 +122,33 @@ void loop()
   if (!host_command.mannual_control)
   {
     /*Maintain the up and down pressure from Host command*/
-    softArm.maintainUpPressure(pressureUp, pressureUp + 10000);
-    softArm.maintainDownPressure(pressureDown - 10000, pressureDown);
+    //softArm.maintainUpPressure(pressureUp, pressureUp + 10000);
+    //softArm.maintainDownPressure(pressureDown - 10000, pressureDown);
+    if(pressureUp){
+      softArm.pSource.start();
+    }
+    else{
+      softArm.pSource.stop();
+    }
+
+        if(pressureDown){
+      softArm.pSink.start();
+    }
+    else{
+      softArm.pSink.stop();
+    }
+
+
 
     /*If actuators have sensors*/
     //softArm.readPressureAll();
 
-    softArm.writePressureAll(commandActuator);
+    //softArm.writePressureAll(commandActuator);
+     for(int i=0;i<SEGNUM;i++){
+       for(int j=0;j<ACTNUM;j++){
+          softArm.writeOpeningAll(commandActuator);
+       }
+     }
   }
   else
   {
@@ -143,20 +173,20 @@ void loop()
     //
     if ((!host_command.valveIn) && (!host_command.valveOut))
     {
-      softArm.writeOpeningAll(0);
+      softArm.writeOpening(0);
     }
 
     else if  ((!host_command.valveIn) && (host_command.valveOut))
     {
-      softArm.writeOpeningAll(-1);
+      softArm.writeOpening(-1);
     }
     else if  ((host_command.valveIn) && (!host_command.valveOut))
     {
-      softArm.writeOpeningAll(1);
+      softArm.writeOpening(1);
     }
     else if  ((host_command.valveIn) && (host_command.valveOut))
     {
-      softArm.writeOpeningAll(2);
+      softArm.writeOpening(2);
     }
   }
 
