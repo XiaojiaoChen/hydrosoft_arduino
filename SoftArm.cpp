@@ -32,7 +32,13 @@ void SOFT_ARM::setupValvePorts(uint8_t *ports)
 		}
 	}
 }
-
+void SOFT_ARM::setupGripperPorts(uint8_t cp1,uint8_t cp2)
+{
+	pinMode(cp1,OUTPUT);
+	pinMode(cp2,OUTPUT);
+	gripper.attachPWM(cp1,cp2);
+	gripper.writeOpening(0);
+}
 void SOFT_ARM::setupPumpPorts(uint8_t cp1,uint8_t sp1, uint8_t cp2, uint8_t sp2)
 {
 	pinMode(cp1,OUTPUT);

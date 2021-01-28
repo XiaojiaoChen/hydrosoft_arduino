@@ -24,13 +24,15 @@ extern "C"
 		SOFT_ARM();
 
 		CHAMBER actuators[SEGNUM][ACTNUM];
+		CHAMBER gripper;
 
 		PRESSURE_SOURCE pSource;
 		PRESSURE_SOURCE pSink;
 
 		void setupValvePorts(uint8_t *ports);
 		void setupPumpPorts(uint8_t cp1,uint8_t sp1, uint8_t cp2, uint8_t sp2);
-
+		void setupGripperPorts(uint8_t cp1,uint8_t cp2);
+		
 		void maintainUpPressure(int32_t posP, int32_t posP2);
 		void maintainDownPressure(int32_t negP, int32_t negP2);
 

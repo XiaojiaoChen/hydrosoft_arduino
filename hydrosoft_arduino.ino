@@ -28,6 +28,11 @@ uint8_t valveControlPorts[2*ACTALLNUM] =
         29, 45, 31, 47, 33, 49, 22, 38, //Seg 1  (Root segment)
         24, 40, 26, 42, 28, 44, 30, 46  //Seg 2
 };
+
+uint8_t gripperControlPorts[2] =
+    { // PumpHigh      PumpLow
+        25, 41};
+
 uint8_t PumpControlPorts[2] =
     { // PumpHigh      PumpLow
         25, 41};
@@ -52,6 +57,7 @@ public:
   uint16_t pumpOut;         //0:Force Off    1:Force On  ,only effecive when mannual_control==1;
   uint16_t valveIn;         //0:Force Close    1:Force Open  ,only effecive when mannual_control==1;
   uint16_t valveOut;        //0:Force Close    1:Force Open  ,only effecive when mannual_control==1;
+  int16_t gripper;
 };
 CommandTypeDef host_command;
 
@@ -83,6 +89,7 @@ void subscriberCallback(const hydrosoft_ros::Command_Arm &cmd_msg)
   host_command.pumpOut = __GET_BIT(cmd_msg.cmd, PUMPOUTMASK);
   host_command.valveIn = __GET_BIT(cmd_msg.cmd, VALVEINMASK);
   host_command.valveOut = __GET_BIT(cmd_msg.cmd, VALVEOUTMASK);
+  host_command.gripper=cmd_msg.gripper;
 }
 
 ros::NodeHandle node_handle;
@@ -103,6 +110,9 @@ void setup()
 
   /*soft arm Valves' port mapping*/
   softArm.setupValvePorts(valveControlPorts);
+
+  /*soft arm Valves' port mapping*/
+  softArm.setupGripperPorts(gripperControlPorts[0],gripperControlPorts[1]);
 
   /*soft arm Pumps' port mapping*/
   softArm.setupPumpPorts(PumpControlPorts[0], PumpSensorPorts[0],PumpControlPorts[1], PumpSensorPorts[1]);
@@ -138,7 +148,8 @@ void loop()
       softArm.pSink.stop();
     }
 
-
+    
+    
 
     /*If actuators have sensors*/
     //softArm.readPressureAll();
@@ -190,10 +201,12 @@ void loop()
     }
   }
 
+  softArm.gripper.writeOpening(host_command.gripper);
+
   /*Filling the pump message, in KPa*/
   sensor_msg.pumpIn = softArm.pSource.pump.status;
   sensor_msg.pumpOut = softArm.pSink.pump.status;
-
+  sensor_msg.gripper = softArm.gripper.opening;
   /*Filling the valve message, in [-1, 0, 1]*/
   for (int i = 0; i < 2; i++)
   {
