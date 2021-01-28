@@ -20,6 +20,7 @@ extern "C" {
 
 #include "PUMP.h"
 #include "PRESSURESENSOR.h"
+#include "SOLENOIDVALVE.h"
 typedef enum{
 	HIGH_PRESSURE_SOURCE = 0,
 	LOW_PRESSURE_SINK=1
@@ -27,16 +28,18 @@ typedef enum{
 
 class PRESSURE_SOURCE {
 public:
-	PRESSURE_SOURCE(int DigitalPort=0,int AnalogPort=0,int Psourcetype=HIGH_PRESSURE_SOURCE);
-	void attach(int DigitalPort,int AnalogPort);
+	PRESSURE_SOURCE(int DigitalPort=0,int valvePort=1,int AnalogPort=0,int Psourcetype=HIGH_PRESSURE_SOURCE);
+	void attach(int DigitalPort,int valPort,int AnalogPort);
 	void attachPump(int DigitalPort);
 	void attachSensor(int AnalogPort);
+	void attachValve(int valvePort);
 	int32_t readPressure();
 	void maintainPressure(int32_t p_low,int32_t p_high);
 	void stop(void);
 	void start(void);
 	int sourceType;
 	PUMP pump;
+	SOLENOID_VALVE valve;
 	PRESSURE_SENSOR pressureSensor;
 	int direction;
 	int32_t pressure;

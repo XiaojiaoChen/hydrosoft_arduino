@@ -11,19 +11,21 @@
 #include "PRESSURESOURCE.h"
 
 
-PRESSURE_SOURCE::PRESSURE_SOURCE(int DigitalPort, int AnalogPort,int sType) {
-	attach(DigitalPort,AnalogPort);
+PRESSURE_SOURCE::PRESSURE_SOURCE(int DigitalPort, int valvePort, int AnalogPort,int sType) {
+	attach(DigitalPort, valvePort, AnalogPort);
 	sourceType = sType;
 	direction=0;
 	pressure=0;
 	pressureLower=0;
 	pressureUpper=0;
+	valve.writeDuty(0);
 }
 
 
-void PRESSURE_SOURCE::attach(int DigitalPort, int AnalogPort) {
+void PRESSURE_SOURCE::attach(int DigitalPort,int valvePort, int AnalogPort) {
 	attachPump(DigitalPort);
 	attachSensor(AnalogPort);
+	attachValve(valvePort);
 }
 
 void PRESSURE_SOURCE::attachPump(int DigitalPort) {
@@ -33,7 +35,9 @@ void PRESSURE_SOURCE::attachPump(int DigitalPort) {
 void PRESSURE_SOURCE::attachSensor(int AnalogPort) {
 	pressureSensor.attach(AnalogPort);
 }
-
+void PRESSURE_SOURCE::attachValve(int valPort) {
+	valve.attach(valPort);
+}
 void PRESSURE_SOURCE::maintainPressure(int32_t p_low,int32_t p_high) {
 
 	pressureLower=p_low;
@@ -64,10 +68,12 @@ void PRESSURE_SOURCE::maintainPressure(int32_t p_low,int32_t p_high) {
 void PRESSURE_SOURCE::stop()
 {
 	pump.stop();
+	valve.writeDuty(0);
 }
 void PRESSURE_SOURCE::start()
 {
 	pump.start();
+	valve.writeDuty(1);
 }
 
 int32_t PRESSURE_SOURCE::readPressure() {

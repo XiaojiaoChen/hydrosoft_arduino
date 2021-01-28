@@ -24,9 +24,9 @@ void SOFT_ARM::setupValvePorts(uint8_t *ports)
 	{
 		for (int i = 0; i < ACTNUM; i++)
 		{
-			pinMode(ports[k],OUTPUT);
-			pinMode(ports[k+1],OUTPUT);
-			actuators[j][i].attachPWM(ports[k],ports[k+1]);
+			pinMode(ports[2*(j*ACTNUM+i)+0],OUTPUT);
+			pinMode(ports[2*(j*ACTNUM+i)+1],OUTPUT);
+			actuators[j][i].attachPWM(ports[2*(j*ACTNUM+i)+0],ports[2*(j*ACTNUM+i)+1]);
 			actuators[j][i].writeOpening(0);
 			k++;
 		}
@@ -39,12 +39,14 @@ void SOFT_ARM::setupGripperPorts(uint8_t cp1,uint8_t cp2)
 	gripper.attachPWM(cp1,cp2);
 	gripper.writeOpening(0);
 }
-void SOFT_ARM::setupPumpPorts(uint8_t cp1,uint8_t sp1, uint8_t cp2, uint8_t sp2)
+void SOFT_ARM::setupPumpPorts(uint8_t cp1,uint8_t vp1,uint8_t sp1, uint8_t cp2, uint8_t vp2,uint8_t sp2)
 {
 	pinMode(cp1,OUTPUT);
 	pinMode(cp2,OUTPUT);
-	pSource.attach(cp1, sp2);
-	pSink.attach(cp2, sp2);
+	pinMode(vp1,OUTPUT);
+	pinMode(vp2,OUTPUT);
+	pSource.attach(cp1, vp1,sp1);
+	pSink.attach(cp2,vp2, sp2);
 }
 
 void SOFT_ARM::maintainUpPressure(int32_t posP, int32_t posP2)
