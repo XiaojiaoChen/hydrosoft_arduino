@@ -12,7 +12,7 @@
 #include "SOLENOIDVALVE.h"
 
 
-SOLENOID_VALVE::SOLENOID_VALVE(int num){
+SOLENOID_VALVE::SOLENOID_VALVE(uint8_t num){
 
 	_duty=0;
 	duty=(PWM_DIGITAL_OUTPUT_REVERSED == 0)?_duty:(1-_duty);
@@ -21,7 +21,7 @@ SOLENOID_VALVE::SOLENOID_VALVE(int num){
 	attach(num);
 }
 
-void SOLENOID_VALVE::attach(int num)
+void SOLENOID_VALVE::attach(uint8_t num)
 {
 	PWMPort = num;
 }

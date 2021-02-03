@@ -6,6 +6,7 @@
 #include <hydrosoft_ros/Command_Position_Arm.h>
 #include <std_msgs/String.h>
 #include "SoftArm.h"
+#define ACTNUM 4
 #define ACTALLNUM 8
 
 #define MANNUALMASK (0x0001)
@@ -13,6 +14,8 @@
 #define PUMPINMASK (0x0004)
 #define VALVEOUTMASK (0x0008)
 #define VALVEINMASK (0x0010)
+#define PUMPINVALVEMASK (0x0020)
+#define PUMPOUTVALVEMASK (0x0040)
 
 #define __SET_BIT(__VALUE__, __BITMASK__) ((__VALUE__) |= (__BITMASK__))
 #define __RESET_BIT(__VALUE__, __BITMASK__) ((__VALUE__) &= ~(__BITMASK__))
@@ -25,15 +28,15 @@ uint8_t valveControlPorts[2 * ACTALLNUM] =
     // Act1      Act2       Act3      Act4
     //In,Out,   In,Out,   In,Out,   In,Out,
     {
-        31, 47, 33, 49, 24, 38, 22, 40, //Seg 1  (Root segment)
-        26, 42, 28, 44, 30, 46,  32, 48       //Seg 2
+        31, 47, 33, 49, 24, 38, 34, 40, //Seg 1  (Root segment)
+        26, 42, 28, 44, 30, 46, 32, 48  //Seg 2y
 };
-uint8_t PumpInControlPorts[2] =
-    { // PumpHigh      PumpLow
-        41, 43};
-uint8_t PumpOutControlPorts[2] =
-    { // PumpHigh      PumpLow
-        25, 27};
+uint8_t PumpInControlPorts = 41;
+uint8_t PumpInValveControlPorts = 43;
+
+uint8_t PumpOutControlPorts =  25;
+uint8_t PumpOutValveControlPorts = 27;
+
 uint8_t gripperControlPorts[2] = {
     // gripperIn      gripperOut
     29, 45};
@@ -44,7 +47,7 @@ uint8_t PumpSensorPorts[2] = {
 
 int16_t commandActuator[ACTALLNUM]; //translated command in Pa
 
-int32_t pressureUp = 0;    //30,000Pa limit  for positive pressure
+int32_t pressureUp = 0;   //30,000Pa limit  for positive pressure
 int32_t pressureDown = 0; //-30,000Pa limit for negative pressure
 
 /*********** in Pa ******************/
@@ -57,6 +60,8 @@ public:
   uint16_t pumpOut;         //0:Force Off    1:Force On  ,only effecive when mannual_control==1;
   uint16_t valveIn;         //0:Force Close    1:Force Open  ,only effecive when mannual_control==1;
   uint16_t valveOut;        //0:Force Close    1:Force Open  ,only effecive when mannual_control==1;
+  uint16_t pumpInValve;
+  uint16_t pumpOutValve;
   int16_t gripper;
 };
 CommandTypeDef host_command;
@@ -85,6 +90,8 @@ void subscriberCallback(const hydrosoft_ros::Command_Arm &cmd_msg)
   host_command.pumpOut = __GET_BIT(cmd_msg.cmd, PUMPOUTMASK);
   host_command.valveIn = __GET_BIT(cmd_msg.cmd, VALVEINMASK);
   host_command.valveOut = __GET_BIT(cmd_msg.cmd, VALVEOUTMASK);
+  host_command.pumpInValve = __GET_BIT(cmd_msg.cmd, PUMPINVALVEMASK);
+  host_command.pumpOutValve = __GET_BIT(cmd_msg.cmd, PUMPOUTVALVEMASK);
   host_command.gripper = cmd_msg.gripper;
 }
 
@@ -112,12 +119,11 @@ void setup()
   softArm.setupGripperPorts(gripperControlPorts[0], gripperControlPorts[1]);
 
   /*soft arm Pumps' port mapping*/
-  softArm.setupPumpPorts(PumpInControlPorts[0],PumpInControlPorts[1], PumpSensorPorts[0], PumpOutControlPorts[0], PumpOutControlPorts[1],PumpSensorPorts[1]);
+  softArm.setupPumpPorts(PumpInControlPorts, PumpInValveControlPorts, PumpSensorPorts[0], PumpOutControlPorts, PumpOutValveControlPorts, PumpSensorPorts[1]);
 
   /*setup buffer pointer and length*/
   sensor_msg.actuator = sensorActuatorBuffer;
   sensor_msg.actuator_length = ACTALLNUM;
-
 }
 
 /***********Only transfer in KPa, otherwise all in Pa ******************/
@@ -131,34 +137,31 @@ void loop()
     //softArm.maintainDownPressure(pressureDown - 10000, pressureDown);
     if (pressureUp)
     {
-      softArm.pSource.start();  /*soft arm Pumps' port mapping*/
-
+      softArm.pSource.openValve();
+      softArm.pSource.start(); /*soft arm Pumps' port mapping*/
     }
     else
     {
       softArm.pSource.stop();
+      softArm.pSource.closeValve();
     }
 
     if (pressureDown)
     {
+      softArm.pSink.openValve();
       softArm.pSink.start();
     }
     else
     {
       softArm.pSink.stop();
+      softArm.pSink.closeValve();
     }
 
     /*If actuators have sensors*/
     //softArm.readPressureAll();
 
     //softArm.writePressureAll(commandActuator);
-    for (int i = 0; i < SEGNUM; i++)
-    {
-      for (int j = 0; j < ACTNUM; j++)
-      {
-        softArm.writeOpeningAll(commandActuator);
-      }
-    }
+     softArm.writeOpeningAll(commandActuator);
   }
   else
   {
@@ -180,12 +183,29 @@ void loop()
       softArm.stopPumpOut();
     }
 
+    if (host_command.pumpInValve)
+    {
+      softArm.pSource.openValve();
+    }
+    else
+    {
+      softArm.pSource.closeValve();
+    }
+
+    if (host_command.pumpOutValve)
+    {
+      softArm.pSink.openValve();
+    }
+    else
+    {
+      softArm.pSink.closeValve();
+    }
+
     //
     if ((!host_command.valveIn) && (!host_command.valveOut))
     {
       softArm.writeOpening(0);
     }
-
     else if ((!host_command.valveIn) && (host_command.valveOut))
     {
       softArm.writeOpening(-1);

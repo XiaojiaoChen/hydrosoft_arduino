@@ -17,11 +17,11 @@ extern "C" {
 #include  <inttypes.h>
 class PUMP {
 public:
-	PUMP(int num=0);
-	void attach(int num);
+	PUMP(uint8_t num=0);
+	void attach(uint8_t num);
 	void start();
 	void stop();
-	int DigitalPort;
+	uint8_t DigitalPort;
 	int16_t status;
 };
 

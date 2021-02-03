@@ -28,15 +28,17 @@ typedef enum{
 
 class PRESSURE_SOURCE {
 public:
-	PRESSURE_SOURCE(int DigitalPort=0,int valvePort=1,int AnalogPort=0,int Psourcetype=HIGH_PRESSURE_SOURCE);
-	void attach(int DigitalPort,int valPort,int AnalogPort);
-	void attachPump(int DigitalPort);
-	void attachSensor(int AnalogPort);
-	void attachValve(int valvePort);
+	PRESSURE_SOURCE(uint8_t DigitalPort=0,uint8_t valvePort=1,uint8_t AnalogPort=0,uint8_t Psourcetype=HIGH_PRESSURE_SOURCE);
+	void attach(uint8_t DigitalPort,uint8_t valPort,uint8_t AnalogPort);
+	void attachPump(uint8_t DigitalPort);
+	void attachSensor(uint8_t AnalogPort);
+	void attachValve(uint8_t valvePort);
 	int32_t readPressure();
 	void maintainPressure(int32_t p_low,int32_t p_high);
 	void stop(void);
 	void start(void);
+	void openValve(void);
+	void closeValve(void);
 	int sourceType;
 	PUMP pump;
 	SOLENOID_VALVE valve;

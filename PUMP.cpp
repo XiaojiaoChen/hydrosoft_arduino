@@ -12,12 +12,12 @@
 #include "PUMP.h"
 
 
-PUMP::PUMP(int num) {
+PUMP::PUMP(uint8_t num) {
 	status=0;
 	attach(num);
 }
 
-void PUMP::attach(int num)
+void PUMP::attach(uint8_t num)
 {
 	DigitalPort = num;
 }

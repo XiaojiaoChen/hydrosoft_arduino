@@ -18,9 +18,9 @@ extern "C" {
 
 class PRESSURE_SENSOR {
 public:
-	PRESSURE_SENSOR(int num = 0);
-	void attach(int num);
-	int AnalogPort;
+	PRESSURE_SENSOR(uint8_t num = 0);
+	void attach(uint8_t num);
+	uint8_t AnalogPort;
 
 	int32_t read();
 	void setSensorRange_GaugePa(int32_t pmin,int32_t pmax);

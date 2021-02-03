@@ -18,7 +18,7 @@ const int32_t pressureSensorType1_pMin =   0;
 const int32_t pressureSensorType1_pMax =  50*PascalPerPSI;
 
 
-PRESSURE_SENSOR::PRESSURE_SENSOR(int num):
+PRESSURE_SENSOR::PRESSURE_SENSOR(uint8_t num):
 pressure(0)
 {
 	attach(num);
@@ -31,7 +31,7 @@ int32_t PRESSURE_SENSOR::read()
 	return pressure;
 }
 
-void PRESSURE_SENSOR::attach(int num)
+void PRESSURE_SENSOR::attach(uint8_t num)
 {
 	AnalogPort = num;
 

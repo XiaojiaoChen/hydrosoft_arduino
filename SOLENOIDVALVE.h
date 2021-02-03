@@ -18,15 +18,15 @@ extern "C" {
 
 class SOLENOID_VALVE {
 public:
-	SOLENOID_VALVE(int num=0);
-	void attach(int num);
+	SOLENOID_VALVE(uint8_t num=0);
+	void attach(uint8_t num);
 
 	void writeDuty(int16_t dut);
 
 
 
 private:
-	int PWMPort;
+	uint8_t PWMPort;
 	int16_t duty;    //nominal duty. 0 for close and 1 for open
 	int16_t _duty;   //physical PWM duty. 
 	int16_t dutyMin;

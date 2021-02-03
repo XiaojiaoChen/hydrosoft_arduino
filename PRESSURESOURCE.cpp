@@ -11,7 +11,7 @@
 #include "PRESSURESOURCE.h"
 
 
-PRESSURE_SOURCE::PRESSURE_SOURCE(int DigitalPort, int valvePort, int AnalogPort,int sType) {
+PRESSURE_SOURCE::PRESSURE_SOURCE(uint8_t DigitalPort, uint8_t valvePort, uint8_t AnalogPort,uint8_t sType) {
 	attach(DigitalPort, valvePort, AnalogPort);
 	sourceType = sType;
 	direction=0;
@@ -22,20 +22,20 @@ PRESSURE_SOURCE::PRESSURE_SOURCE(int DigitalPort, int valvePort, int AnalogPort,
 }
 
 
-void PRESSURE_SOURCE::attach(int DigitalPort,int valvePort, int AnalogPort) {
+void PRESSURE_SOURCE::attach(uint8_t DigitalPort,uint8_t valvePort, uint8_t AnalogPort) {
 	attachPump(DigitalPort);
 	attachSensor(AnalogPort);
 	attachValve(valvePort);
 }
 
-void PRESSURE_SOURCE::attachPump(int DigitalPort) {
+void PRESSURE_SOURCE::attachPump(uint8_t DigitalPort) {
 	pump.attach(DigitalPort);
 }
 
-void PRESSURE_SOURCE::attachSensor(int AnalogPort) {
+void PRESSURE_SOURCE::attachSensor(uint8_t AnalogPort) {
 	pressureSensor.attach(AnalogPort);
 }
-void PRESSURE_SOURCE::attachValve(int valPort) {
+void PRESSURE_SOURCE::attachValve(uint8_t valPort) {
 	valve.attach(valPort);
 }
 void PRESSURE_SOURCE::maintainPressure(int32_t p_low,int32_t p_high) {
@@ -68,12 +68,16 @@ void PRESSURE_SOURCE::maintainPressure(int32_t p_low,int32_t p_high) {
 void PRESSURE_SOURCE::stop()
 {
 	pump.stop();
-	valve.writeDuty(0);
 }
 void PRESSURE_SOURCE::start()
 {
 	pump.start();
+}
+void PRESSURE_SOURCE::openValve(){
 	valve.writeDuty(1);
+}
+void PRESSURE_SOURCE::closeValve(){
+	valve.writeDuty(0);
 }
 
 int32_t PRESSURE_SOURCE::readPressure() {

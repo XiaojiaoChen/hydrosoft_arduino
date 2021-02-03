@@ -19,7 +19,7 @@ pSink(0,0,LOW_PRESSURE_SINK)
 void SOFT_ARM::setupValvePorts(uint8_t *ports)
 {
 	/*Every actuator is refered to with two numbers, segNum(0-3) and bellowNum(0-3)*/
-	int k=0;
+
 	for (int j = 0; j < SEGNUM; j++)
 	{
 		for (int i = 0; i < ACTNUM; i++)
@@ -28,7 +28,6 @@ void SOFT_ARM::setupValvePorts(uint8_t *ports)
 			pinMode(ports[2*(j*ACTNUM+i)+1],OUTPUT);
 			actuators[j][i].attachPWM(ports[2*(j*ACTNUM+i)+0],ports[2*(j*ACTNUM+i)+1]);
 			actuators[j][i].writeOpening(0);
-			k++;
 		}
 	}
 }
@@ -82,12 +81,11 @@ void SOFT_ARM::zeroPressureAll()
 
 void SOFT_ARM::writePressureAll(int32_t *pCommand)
 {
-	int k = 0;
 	for (int j = 0; j < SEGNUM; j++)
 	{
 		for (int i = 0; i < ACTNUM; i++)
 		{
-			actuators[j][i].writePressure(pCommand[k++]);
+			actuators[j][i].writePressure(pCommand[j*ACTNUM+i]);
 		}
 	}
 }
@@ -111,7 +109,7 @@ void SOFT_ARM::writeOpeningAll(int16_t *op)
 	{
 		for (int i = 0; i < ACTNUM; i++)
 		{
-			actuators[j][i].writeOpening(*op++);
+			actuators[j][i].writeOpening(op[j*ACTNUM+i]);
 		}
 	}
 }
